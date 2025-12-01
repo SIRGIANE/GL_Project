@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: risk_predictor_backend
+    ports:
+      - "5001:5000"
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:password@db:5432/risk_predictor
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+      - ./notebooks:/app/notebooks
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: risk_predictor_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  db:
+    image: postgres:14
+    container_name: risk_predictor_db
+    environment:
+      - POSTGRES_DB=risk_predictor
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: risk_predictor_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: risk_predictor_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - app-network
+
+  jupyter:
+    build:
+      context: ./notebooks
+      dockerfile: Dockerfile
+    container_name: risk_predictor_jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+      - ./backend:/home/jovyan/backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  app-network:
+    driver: bridge

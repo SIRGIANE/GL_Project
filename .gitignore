@@ -1,0 +1,93 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Node.js (for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Data files (you may want to keep some)
+data/raw/*.csv
+data/processed/*.csv
+data/models/*.pkl
+data/models/*.joblib
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Screenshots (optional - remove this line if you want to include screenshots)
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Docker volumes
+postgres_data/
+redis_data/
