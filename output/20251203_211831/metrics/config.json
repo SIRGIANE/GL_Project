@@ -1,0 +1,30 @@
+{
+  "timestamp": "2025-12-03T21:31:34.209549",
+  "data_info": {
+    "total_samples": 27615,
+    "total_features": 42,
+    "target_column": "defects",
+    "class_distribution": {
+      "false": 22303,
+      "true": 4790,
+      "no": 415,
+      "yes": 107
+    }
+  },
+  "preprocessing": {
+    "scaler": "StandardScaler",
+    "pca_components": 20,
+    "pca_variance_explained": 0.9788223511993983,
+    "smote_applied": true
+  },
+  "models_trained": [
+    "Random Forest",
+    "Logistic Regression",
+    "SVM (RBF)",
+    "K-Nearest Neighbors",
+    "Gradient Boosting"
+  ],
+  "best_model": "K-Nearest Neighbors",
+  "best_f1_score": 0.7930985653224258,
+  "best_accuracy": 0.8149556400506971
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "Model":"K-Nearest Neighbors",
+    "Accuracy":0.8149556401,
+    "F1-Score":0.7930985653,
+    "Precision":0.7843423241,
+    "Recall":0.8149556401,
+    "ROC-AUC":0.699097419,
+    "CV-Mean":0.7879838163,
+    "CV-Std":0.0059223029
+  },
+  {
+    "Model":"Random Forest",
+    "Accuracy":0.8332428028,
+    "F1-Score":0.789372586,
+    "Precision":0.8033930391,
+    "Recall":0.8332428028,
+    "ROC-AUC":0.7692594214,
+    "CV-Mean":0.7819963306,
+    "CV-Std":0.0024074591
+  },
+  {
+    "Model":"Gradient Boosting",
+    "Accuracy":0.8321564367,
+    "F1-Score":0.7875911474,
+    "Precision":0.8008474696,
+    "Recall":0.8321564367,
+    "ROC-AUC":0.7572857022,
+    "CV-Mean":0.7791534829,
+    "CV-Std":0.0032502535
+  },
+  {
+    "Model":"Logistic Regression",
+    "Accuracy":0.8265435452,
+    "F1-Score":0.7687190177,
+    "Precision":0.7873824492,
+    "Recall":0.8265435452,
+    "ROC-AUC":0.7223066437,
+    "CV-Mean":0.7682741716,
+    "CV-Std":0.0034671079
+  },
+  {
+    "Model":"SVM (RBF)",
+    "Accuracy":0.8261814231,
+    "F1-Score":0.7666807783,
+    "Precision":0.7864901168,
+    "Recall":0.8261814231,
+    "ROC-AUC":0.6398613849,
+    "CV-Mean":0.7645845297,
+    "CV-Std":0.0025876314
+  }
+]
