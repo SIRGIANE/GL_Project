@@ -1,0 +1,406 @@
+{% extends "base.html" %}
+
+{% block title %}Historique - Bug Predictor AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-history me-2 text-vscode-blue"></i>
+                    Historique des Analyses
+                </h2>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-danger btn-sm" id="clear-history">
+                        <i class="fas fa-trash me-1"></i>Clear History
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="refresh-history">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-vscode-panel border-primary">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-bar text-primary mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="mb-1" id="total-analyses">{{ analyses|length }}</h5>
+                            <small class="text-vscode-secondary">Total Analyses</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-vscode-panel border-success">
+                        <div class="card-body text-center">
+                            <i class="fas fa-check-circle text-success mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="mb-1" id="clean-code">0</h5>
+                            <small class="text-vscode-secondary">Code Sain</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-vscode-panel border-warning">
+                        <div class="card-body text-center">
+                            <i class="fas fa-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="mb-1" id="buggy-code">0</h5>
+                            <small class="text-vscode-secondary">Code Bogué</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-vscode-panel border-info">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clock text-info mb-2" style="font-size: 2rem;"></i>
+                            <h5 class="mb-1" id="avg-time">-</h5>
+                            <small class="text-vscode-secondary">Temps Moyen</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if analyses %}
+            <!-- History Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Analyses Récentes
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="history-table">
+                            <thead>
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th width="15%">Date/Heure</th>
+                                    <th width="30%">Code</th>
+                                    <th width="10%">Résultat</th>
+                                    <th width="10%">Probabilité</th>
+                                    <th width="10%">Risque</th>
+                                    <th width="10%">Modèle</th>
+                                    <th width="10%">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for analysis in analyses|reverse %}
+                                <tr class="analysis-row" data-analysis-id="{{ analysis.id }}">
+                                    <td>
+                                        <span class="badge bg-secondary">{{ loop.index }}</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-vscode-secondary">
+                                            {{ analysis.timestamp[:19] | replace('T', ' ') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="code-preview">
+                                            <code class="text-vscode-blue">{{ analysis.code_snippet }}</code>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if analysis.result.is_bug %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-bug me-1"></i>Bug
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Sain
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 8px;">
+                                            {% set prob_percent = (analysis.result.probability * 100) | round(1) %}
+                                            <div class="progress-bar 
+                                                {% if prob_percent >= 80 %}bg-danger
+                                                {% elif prob_percent >= 60 %}bg-warning
+                                                {% elif prob_percent >= 40 %}bg-info
+                                                {% else %}bg-success{% endif %}" 
+                                                style="width: {{ prob_percent }}%">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">{{ prob_percent }}%</small>
+                                    </td>
+                                    <td>
+                                        {% set risk = analysis.result.risk_level %}
+                                        {% if risk == "ÉLEVÉ" %}
+                                            <span class="badge bg-danger">{{ risk }}</span>
+                                        {% elif risk == "MODÉRÉ" %}
+                                            <span class="badge bg-warning">{{ risk }}</span>
+                                        {% elif risk == "FAIBLE" %}
+                                            <span class="badge bg-info">{{ risk }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success">{{ risk }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-vscode-secondary">
+                                            {{ analysis.result.model_used | default('N/A') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-outline-info btn-sm view-details" 
+                                                    data-analysis-id="{{ analysis.id }}"
+                                                    title="Voir détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary btn-sm rerun-analysis" 
+                                                    data-code="{{ analysis.code_snippet }}"
+                                                    title="Re-analyser">
+                                                <i class="fas fa-redo"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-vscode-secondary">
+                        Affichage des {{ analyses|length }} dernières analyses
+                    </small>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Empty State -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-history text-vscode-secondary mb-3" style="font-size: 4rem;"></i>
+                    <h4 class="text-vscode-secondary">Aucun historique</h4>
+                    <p class="text-muted mb-4">
+                        Vous n'avez pas encore effectué d'analyses. Commencez par analyser du code !
+                    </p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Première Analyse
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Analysis Details -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-vscode-panel">
+            <div class="modal-header border-bottom border-vscode-border">
+                <h5 class="modal-title text-vscode-primary">
+                    <i class="fas fa-chart-bar me-2"></i>Détails de l'Analyse
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modal-content">
+                <!-- Content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Calculate and display statistics
+    calculateStats();
+    
+    // Event listeners
+    document.getElementById('clear-history')?.addEventListener('click', clearHistory);
+    document.getElementById('refresh-history')?.addEventListener('click', refreshHistory);
+    
+    // View details buttons
+    document.querySelectorAll('.view-details').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const analysisId = this.getAttribute('data-analysis-id');
+            viewAnalysisDetails(analysisId);
+        });
+    });
+    
+    // Rerun analysis buttons
+    document.querySelectorAll('.rerun-analysis').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const code = this.getAttribute('data-code');
+            rerunAnalysis(code);
+        });
+    });
+});
+
+function calculateStats() {
+    const rows = document.querySelectorAll('.analysis-row');
+    let cleanCount = 0;
+    let buggyCount = 0;
+    let totalTime = 0;
+    let timeCount = 0;
+    
+    rows.forEach(row => {
+        // Count clean vs buggy
+        const badge = row.querySelector('.badge');
+        if (badge && badge.textContent.includes('Sain')) {
+            cleanCount++;
+        } else if (badge && badge.textContent.includes('Bug')) {
+            buggyCount++;
+        }
+    });
+    
+    document.getElementById('clean-code').textContent = cleanCount;
+    document.getElementById('buggy-code').textContent = buggyCount;
+    
+    // Calculate average time if available
+    if (timeCount > 0) {
+        const avgTime = (totalTime / timeCount).toFixed(2);
+        document.getElementById('avg-time').textContent = avgTime + 's';
+    }
+}
+
+async function clearHistory() {
+    if (!confirm('Êtes-vous sûr de vouloir vider l\'historique ?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/clear-cache', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            window.VSCodeInterface?.showNotification('Historique vidé avec succès', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            throw new Error('Erreur lors de la suppression');
+        }
+    } catch (error) {
+        window.VSCodeInterface?.showNotification('Erreur: ' + error.message, 'error');
+    }
+}
+
+function refreshHistory() {
+    window.location.reload();
+}
+
+async function viewAnalysisDetails(analysisId) {
+    try {
+        const response = await fetch(`/api/metrics/${analysisId}`);
+        const analysis = await response.json();
+        
+        if (response.ok) {
+            displayAnalysisDetails(analysis);
+        } else {
+            throw new Error(analysis.error || 'Analyse non trouvée');
+        }
+    } catch (error) {
+        window.VSCodeInterface?.showNotification('Erreur: ' + error.message, 'error');
+    }
+}
+
+function displayAnalysisDetails(analysis) {
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-vscode-primary mb-3">Informations Générales</h6>
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>ID:</strong></td>
+                        <td><code>${analysis.id}</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Date:</strong></td>
+                        <td>${new Date(analysis.timestamp).toLocaleString('fr-FR')}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Résultat:</strong></td>
+                        <td>
+                            ${analysis.result.is_bug ? 
+                                '<span class="badge bg-danger">Bug Détecté</span>' : 
+                                '<span class="badge bg-success">Code Sain</span>'
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Probabilité:</strong></td>
+                        <td>${(analysis.result.probability * 100).toFixed(1)}%</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-vscode-primary mb-3">Métriques Clés</h6>
+                <table class="table table-sm">
+                    ${analysis.result.metrics ? Object.entries(analysis.result.metrics).slice(0, 6).map(([key, value]) => `
+                        <tr>
+                            <td><strong>${key}:</strong></td>
+                            <td>${typeof value === 'number' ? value.toFixed(2) : value}</td>
+                        </tr>
+                    `).join('') : '<tr><td colspan="2">Aucune métrique disponible</td></tr>'}
+                </table>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <h6 class="text-vscode-primary mb-3">Code Analysé</h6>
+                <pre class="bg-vscode-editor p-3 rounded border"><code class="text-vscode-blue">${analysis.code_snippet}</code></pre>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modal-content').innerHTML = content;
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    modal.show();
+}
+
+function rerunAnalysis(code) {
+    // Redirect to main page with code pre-filled
+    sessionStorage.setItem('prefilledCode', code);
+    window.location.href = '/';
+}
+</script>
+
+<style>
+.code-preview {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.analysis-row:hover {
+    background-color: var(--vscode-hover) !important;
+}
+
+.progress {
+    background-color: var(--vscode-bg-secondary);
+}
+
+.modal-content {
+    border: 1px solid var(--vscode-border);
+}
+
+.table-sm td {
+    padding: 0.25rem;
+    border-color: var(--vscode-border);
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Pre-fill code on main page if coming from history
+if (window.location.pathname === '/' && sessionStorage.getItem('prefilledCode')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeEditor = document.getElementById('code');
+        if (codeEditor) {
+            codeEditor.value = sessionStorage.getItem('prefilledCode');
+            sessionStorage.removeItem('prefilledCode');
+        }
+    });
+}
+</script>
+{% endblock %}

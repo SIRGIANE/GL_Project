@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Debug - Bug Predictor AI{% endblock %}
+
+{% block content %}
+<!-- Debug Main Panel -->
+<div class="row g-3">
+    <div class="col-lg-8">
+        <!-- Debug Code Editor Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-bug me-2"></i>debug.py
+                <small class="text-vscode-secondary ms-2">— Local Analysis</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="p-3 bg-vscode-panel border-bottom">
+                    <div class="alert alert-warning border-0 bg-vscode-yellow text-dark mb-0">
+                        <i class="fas fa-flask me-2"></i>
+                        <strong>Debug Mode:</strong> Analyse locale des métriques sans prédiction ML
+                    </div>
+                </div>
+                
+                <textarea 
+                    id="debug-code" 
+                    class="code-editor w-100 border-0" 
+                    rows="15" 
+                    placeholder="# Mode Debug - Analyse locale des métriques&#10;def test_function():&#10;    # Votre code de test ici&#10;    pass"
+                ></textarea>
+                
+                <div class="p-3 bg-vscode-panel border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-secondary example-btn" data-example="clean" title="Code simple">
+                                <i class="fas fa-check me-1"></i>Simple
+                            </button>
+                            <button type="button" class="btn btn-secondary example-btn" data-example="complex" title="Code complexe">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Complex
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="clear-debug-code" title="Effacer">
+                                <i class="fas fa-trash me-1"></i>Clear
+                            </button>
+                        </div>
+                        
+                        <button type="button" class="btn btn-warning" id="debug-analyze-btn">
+                            <i class="fas fa-flask me-2"></i>Run Local Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Panel -->
+        <div id="debug-loading" class="card d-none">
+            <div class="card-header">
+                <i class="fas fa-cog fa-spin me-2"></i>Analyzing Metrics...
+            </div>
+            <div class="card-body text-center py-5">
+                <div class="loading-content">
+                    <div class="spinner-border text-vscode-yellow mb-3" role="status"></div>
+                    <h5 class="text-vscode-primary">Extracting code metrics...</h5>
+                    <p class="text-vscode-secondary mb-0">Local analysis in progress</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Results Panel -->
+        <div id="debug-results" class="card d-none">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-2"></i>Debug Results
+                <small class="text-vscode-secondary ms-2">— Local Metrics</small>
+            </div>
+            <div class="card-body">
+                <!-- Threshold Analysis -->
+                <div id="threshold-analysis" class="mb-4">
+                    <h6 class="fw-bold mb-3 text-vscode-primary">
+                        <i class="fas fa-ruler me-2"></i>Threshold Analysis
+                    </h6>
+                    <div class="row g-3" id="thresholds-container">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Final Evaluation -->
+                <div id="final-evaluation" class="mb-4">
+                    <div class="card bg-vscode-panel border">
+                        <div class="card-body text-center">
+                            <h5 id="evaluation-result" class="mb-2">
+                                <!-- Will be populated by JavaScript -->
+                            </h5>
+                            <p id="evaluation-explanation" class="text-vscode-secondary mb-0">
+                                <!-- Will be populated by JavaScript -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Table -->
+                <div class="table-responsive">
+                    <h6 class="fw-bold mb-3 text-vscode-primary">
+                        <i class="fas fa-table me-2"></i>Extracted Features
+                    </h6>
+                    <table class="table table-hover" id="debug-features-table">
+                        <thead>
+                            <tr>
+                                <th>Index</th>
+                                <th>Feature</th>
+                                <th>Value</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Metrics Visualization -->
+                <div class="mt-4">
+                    <h6 class="fw-bold mb-3 text-vscode-primary">
+                        <i class="fas fa-chart-pie me-2"></i>Metrics Distribution
+                    </h6>
+                    <div class="bg-vscode-editor p-3 border rounded">
+                        <canvas id="debugChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Panels -->
+    <div class="col-lg-4">
+        <!-- Debug Info Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-info-circle me-2"></i>Debug Info
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-flask text-vscode-yellow me-2"></i>
+                        <div>
+                            <strong>Local Analysis</strong><br>
+                            <span class="text-vscode-secondary">No ML prediction</span>
+                        </div>
+                    </div>
+                    
+                    <h6 class="fw-bold text-vscode-primary mb-2">Evaluation Thresholds:</h6>
+                    <div class="threshold-item mb-2">
+                        <code class="text-vscode-blue">n ≥ 300</code>
+                        <small class="text-vscode-secondary d-block">Halstead Length</small>
+                    </div>
+                    <div class="threshold-item mb-2">
+                        <code class="text-vscode-blue">v ≥ 1000</code>
+                        <small class="text-vscode-secondary d-block">Volume</small>
+                    </div>
+                    <div class="threshold-item mb-2">
+                        <code class="text-vscode-blue">d ≥ 50</code>
+                        <small class="text-vscode-secondary d-block">Difficulty</small>
+                    </div>
+                    <div class="threshold-item mb-2">
+                        <code class="text-vscode-blue">effort ≥ 500k</code>
+                        <small class="text-vscode-secondary d-block">Effort</small>
+                    </div>
+                    <div class="threshold-item mb-2">
+                        <code class="text-vscode-blue">time ≥ 5000</code>
+                        <small class="text-vscode-secondary d-block">Time</small>
+                    </div>
+                    
+                    <div class="alert alert-info border-0 bg-vscode-blue text-white mt-3 small">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        If any threshold is exceeded → BUGGY (1)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Console -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-terminal me-2"></i>Debug Console
+            </div>
+            <div class="card-body">
+                <div id="debug-console" class="code-display" style="min-height: 120px; font-size: 11px;">
+                    <span class="text-vscode-green">[DEBUG]</span> Local analyzer ready<br>
+                    <span class="text-vscode-blue">[INFO]</span> Waiting for code input<br>
+                    <span class="text-vscode-secondary">[INFO]</span> Thresholds loaded
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Info -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-chart-line me-2"></i>Metrics Info
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <div class="mb-2">
+                        <strong class="text-vscode-green">Halstead Metrics:</strong>
+                        <div class="text-vscode-secondary">Length, Volume, Difficulty, Effort, Time</div>
+                    </div>
+                    <div class="mb-2">
+                        <strong class="text-vscode-blue">Cyclomatic Complexity:</strong>
+                        <div class="text-vscode-secondary">Code branching complexity</div>
+                    </div>
+                    <div class="mb-2">
+                        <strong class="text-vscode-purple">Lines of Code:</strong>
+                        <div class="text-vscode-secondary">Physical, Logical, Blank, Comments</div>
+                    </div>
+                    <div>
+                        <strong class="text-vscode-orange">Maintainability:</strong>
+                        <div class="text-vscode-secondary">Index & other quality metrics</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Examples -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-code me-2"></i>Test Examples
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-success btn-sm example-btn" data-example="clean">
+                        <i class="fas fa-check me-1"></i> Clean Code Example
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm example-btn" data-example="complex">
+                        <i class="fas fa-exclamation-triangle me-1"></i> Complex Code Example
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Code Examples Data -->
+<script type="application/json" id="examples-data">
+{
+    "clean": "def add_numbers(a, b):\n    \"\"\"Simple addition function\"\"\"\n    return a + b\n\ndef multiply(x, y):\n    \"\"\"Simple multiplication\"\"\"\n    return x * y\n\ndef calculate_area(width, height):\n    \"\"\"Calculate rectangle area\"\"\"\n    if width <= 0 or height <= 0:\n        return 0\n    return width * height",
+    "complex": "# Code complexe avec de nombreuses variables et boucles imbriquées\na0 = a1 = a2 = a3 = a4 = a5 = a6 = a7 = a8 = a9 = 0\na10 = a11 = a12 = a13 = a14 = a15 = a16 = a17 = a18 = a19 = 0\nb0 = b1 = b2 = b3 = b4 = b5 = b6 = b7 = b8 = b9 = 0\nc0 = c1 = c2 = c3 = c4 = c5 = c6 = c7 = c8 = c9 = 0\nd0 = d1 = d2 = d3 = d4 = d5 = d6 = d7 = d8 = d9 = 0\ne0 = e1 = e2 = e3 = e4 = e5 = e6 = e7 = e8 = e9 = 0\nf0 = f1 = f2 = f3 = f4 = f5 = f6 = f7 = f8 = f9 = 0\nresult = a0 + a1 + a2 + a3 + a4 + a5 + a6 + a7 + a8 + a9\nfor i in range(200):\n    for j in range(100):\n        for k in range(50):\n            for l in range(10):\n                result = result * (i+1) * (j+1) * (k+1) * (l+1)\n                if result > 1000000:\n                    result = result / 1000\n                elif result < -1000000:\n                    result = result * -1\n                elif result == 0:\n                    result = 1\n                else:\n                    result = result + a0 + b0 + c0 + d0 + e0 + f0\n                temp_var_1 = temp_var_2 = temp_var_3 = result\n                temp_var_4 = temp_var_5 = temp_var_6 = result * 2\nprint(f'Final complex result: {result}')"
+}
+</script>
+
+<script>
+// Debug page enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    const debugCodeEditor = document.getElementById('debug-code');
+    const debugConsole = document.getElementById('debug-console');
+    
+    // Update debug console
+    function updateDebugConsole(message, type = 'INFO') {
+        const timestamp = new Date().toLocaleTimeString('fr-FR');
+        const colorClass = type === 'ERROR' ? 'text-vscode-red' : 
+                          type === 'SUCCESS' ? 'text-vscode-green' : 
+                          type === 'DEBUG' ? 'text-vscode-yellow' : 'text-vscode-blue';
+        
+        const currentContent = debugConsole.innerHTML;
+        debugConsole.innerHTML = currentContent + 
+            `<br><span class="${colorClass}">[${type}]</span> <span class="text-vscode-secondary">${timestamp}</span> ${message}`;
+        debugConsole.scrollTop = debugConsole.scrollHeight;
+    }
+    
+    // Code input monitoring
+    debugCodeEditor.addEventListener('input', function() {
+        const lines = this.value.split('\n').length;
+        const chars = this.value.length;
+        updateDebugConsole(`Code updated: ${lines} lines, ${chars} characters`, 'DEBUG');
+    });
+    
+    // Clear code button
+    document.getElementById('clear-debug-code')?.addEventListener('click', function() {
+        debugCodeEditor.value = '';
+        updateDebugConsole('Code cleared', 'INFO');
+    });
+    
+    // Example buttons
+    document.querySelectorAll('.example-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const example = this.getAttribute('data-example');
+            const examplesData = JSON.parse(document.getElementById('examples-data').textContent);
+            
+            if (examplesData[example]) {
+                debugCodeEditor.value = examplesData[example];
+                updateDebugConsole(`Loaded ${example} code example`, 'SUCCESS');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/debug.js') }}"></script>
+{% endblock %}

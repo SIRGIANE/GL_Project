@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bug Predictor AI{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- VS Code Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/vscode-icons@0.0.18/dist/index.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- VS Code Container -->
+    <div class="vscode-container">
+        <!-- Activity Bar -->
+        <div class="activity-bar">
+            <div class="activity-item {% if request.endpoint == 'index' %}active{% endif %}" title="Explorer">
+                <i class="fas fa-search"></i>
+            </div>
+            <div class="activity-item {% if request.endpoint == 'debug' %}active{% endif %}" title="Debug">
+                <i class="fas fa-bug"></i>
+            </div>
+            <div class="activity-item" title="Extensions">
+                <i class="fas fa-th-large"></i>
+            </div>
+            <div class="activity-item" title="Source Control">
+                <i class="fas fa-code-branch"></i>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="vscode-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <i class="fas fa-folder-open me-2"></i>Explorer
+                </div>
+                <div class="sidebar-content">
+                    <a href="{{ url_for('index') }}" class="sidebar-item {% if request.endpoint == 'index' %}active{% endif %}">
+                        <i class="fas fa-home"></i>
+                        Prédiction de bugs
+                    </a>
+                    <a href="{{ url_for('debug') }}" class="sidebar-item {% if request.endpoint == 'debug' %}active{% endif %}">
+                        <i class="fas fa-bug"></i>
+                        Analyse & Debug
+                    </a>
+                    <a href="{{ url_for('about') }}" class="sidebar-item {% if request.endpoint == 'about' %}active{% endif %}">
+                        <i class="fas fa-info-circle"></i>
+                        Documentation
+                    </a>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <i class="fas fa-chart-line me-2"></i>Modèles ML
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-item">
+                        <i class="fas fa-brain"></i>
+                        Random Forest
+                    </div>
+                    <div class="sidebar-item">
+                        <i class="fas fa-project-diagram"></i>
+                        Gradient Boosting
+                    </div>
+                    <div class="sidebar-item">
+                        <i class="fas fa-vector-square"></i>
+                        SVM
+                    </div>
+                    <div class="sidebar-item">
+                        <i class="fas fa-sitemap"></i>
+                        K-NN
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-header">
+                    <i class="fas fa-database me-2"></i>Datasets
+                </div>
+                <div class="sidebar-content">
+                    <div class="sidebar-item">
+                        <i class="fas fa-file-csv"></i>
+                        CM1.csv
+                    </div>
+                    <div class="sidebar-item">
+                        <i class="fas fa-file-csv"></i>
+                        JM1.csv
+                    </div>
+                    <div class="sidebar-item">
+                        <i class="fas fa-file-csv"></i>
+                        KC1.csv
+                    </div>
+                    <div class="sidebar-item">
+                        <i class="fas fa-file-csv"></i>
+                        PC1.csv
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="vscode-main">
+            <!-- Tab Bar -->
+            <div class="vscode-tabs">
+                <div class="vscode-tab {% if request.endpoint == 'index' %}active{% endif %}">
+                    <i class="fas fa-search"></i>
+                    Prédiction
+                </div>
+                <div class="vscode-tab {% if request.endpoint == 'debug' %}active{% endif %}">
+                    <i class="fas fa-bug"></i>
+                    Debug
+                </div>
+                <div class="vscode-tab {% if request.endpoint == 'about' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    Documentation
+                </div>
+            </div>
+
+            <!-- Editor Area -->
+            <div class="vscode-editor">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{% if category == 'error' %}danger{% elif category == 'warning' %}warning{% else %}info{% endif %} alert-dismissible fade show mb-3" role="alert">
+                                <i class="fas fa-{% if category == 'error' %}exclamation-triangle{% elif category == 'warning' %}exclamation-circle{% else %}info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Page Content -->
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Status Bar -->
+            <div class="vscode-status-bar">
+                <div class="d-flex">
+                    <div class="status-item">
+                        <i class="fas fa-code-branch me-1"></i>
+                        main
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <span id="error-count">0</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-exclamation-circle me-1"></i>
+                        <span id="warning-count">0</span>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <div class="status-item" id="api-status">
+                        <i class="fas fa-circle text-success me-1" id="api-indicator"></i>
+                        <span id="api-text">API Ready</span>
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-python me-1"></i>
+                        Python 3.10
+                    </div>
+                    <div class="status-item">
+                        <i class="fas fa-flask me-1"></i>
+                        Flask
+                    </div>
+                    <div class="status-item">
+                        <span id="current-time"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <script>
+        // Update current time in status bar
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fr-FR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('current-time').textContent = timeString;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 60000); // Update every minute
+        
+        // Tab switching functionality
+        document.querySelectorAll('.vscode-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.vscode-tab').forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab
+                this.classList.add('active');
+            });
+        });
+    </script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

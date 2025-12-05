@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Prédiction de Bugs - Bug Predictor AI{% endblock %}
+
+{% block content %}
+<!-- Main Code Editor Panel -->
+<div class="row g-3">
+    <div class="col-lg-8">
+        <!-- Code Input Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-file-code me-2"></i>main.py
+                <small class="text-vscode-secondary ms-2">— Code Analysis</small>
+            </div>
+            <div class="card-body p-0">
+                <form id="analyze-form" method="POST" action="{{ url_for('analyze') }}">
+                    <textarea 
+                        id="code" 
+                        name="code" 
+                        class="code-editor w-100 border-0" 
+                        rows="18" 
+                        placeholder="# Collez votre code Python ici pour l'analyser&#10;def example_function():&#10;    # Votre code ici&#10;    pass"
+                        required></textarea>
+                    
+                    <div class="p-3 bg-vscode-panel border-top">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-secondary" id="example-clean" title="Exemple de code propre">
+                                    <i class="fas fa-check me-1"></i>Clean Code
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="example-complex" title="Exemple de code complexe">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Complex Code
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clear-code" title="Effacer le code">
+                                    <i class="fas fa-trash me-1"></i>Clear
+                                </button>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" id="analyze-btn">
+                                <i class="fas fa-play me-2"></i>Run Analysis
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Loading Panel -->
+        <div id="loading-panel" class="card d-none">
+            <div class="card-header">
+                <i class="fas fa-cog fa-spin me-2"></i>Analyzing...
+            </div>
+            <div class="card-body text-center py-5">
+                <div class="loading-content">
+                    <div class="spinner-border text-vscode-blue mb-3" role="status"></div>
+                    <h5 class="text-vscode-primary">Analyzing code metrics...</h5>
+                    <p class="text-vscode-secondary mb-0">Extracting features and running ML models</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div id="results-panel" class="card d-none">
+            <div class="card-header">
+                <i class="fas fa-chart-bar me-2"></i>Analysis Results
+                <small class="text-vscode-secondary ms-2">— ML Predictions</small>
+            </div>
+            <div class="card-body" id="results-content">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Sidebar Panels -->
+    <div class="col-lg-4">
+        <!-- API Status Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-server me-2"></i>API Status
+            </div>
+            <div class="card-body" id="api-status-detail">
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-vscode-blue me-2"></div>
+                    <span class="text-vscode-secondary">Checking API status...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workspace Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-folder-open me-2"></i>Workspace
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-python text-vscode-yellow me-2"></i>
+                        <span>Python Analysis</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-brain text-vscode-purple me-2"></i>
+                        <span>Machine Learning Models</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-chart-line text-vscode-green me-2"></i>
+                        <span>Static Code Metrics</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-bug text-vscode-red me-2"></i>
+                        <span>Bug Prediction</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-terminal me-2"></i>Output
+            </div>
+            <div class="card-body">
+                <div id="console-output" class="code-display" style="min-height: 120px; font-size: 11px;">
+                    <span class="text-vscode-green">[INFO]</span> Bug Predictor AI initialized<br>
+                    <span class="text-vscode-blue">[INFO]</span> Ready to analyze Python code<br>
+                    <span class="text-vscode-secondary">[INFO]</span> Waiting for input...
+                </div>
+            </div>
+        </div>
+
+        <!-- Problems Panel -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-exclamation-triangle me-2"></i>Problems
+            </div>
+            <div class="card-body">
+                <div id="problems-list">
+                    <div class="text-center text-vscode-secondary py-3">
+                        <i class="fas fa-check-circle text-vscode-green mb-2 d-block"></i>
+                        <small>No problems detected</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extensions Panel -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-puzzle-piece me-2"></i>ML Models
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-tree text-vscode-green me-2"></i>
+                            <span>Random Forest</span>
+                        </div>
+                        <span class="badge badge-success">Active</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-project-diagram text-vscode-blue me-2"></i>
+                            <span>Gradient Boosting</span>
+                        </div>
+                        <span class="badge badge-success">Active</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-vector-square text-vscode-purple me-2"></i>
+                            <span>SVM</span>
+                        </div>
+                        <span class="badge badge-success">Active</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-sitemap text-vscode-orange me-2"></i>
+                            <span>K-Nearest Neighbors</span>
+                        </div>
+                        <span class="badge badge-success">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Command Palette (Hidden by default) -->
+<div id="command-palette" class="command-palette d-none">
+    <input type="text" class="command-input" placeholder="Type a command...">
+    <div class="command-results"></div>
+</div>
+
+<!-- Notification Toasts -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+    <div id="success-toast" class="toast" role="alert">
+        <div class="toast-header bg-vscode-green text-dark">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong class="me-auto">Analysis Complete</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body text-dark"></div>
+    </div>
+    
+    <div id="error-toast" class="toast" role="alert">
+        <div class="toast-header bg-vscode-red text-white">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+<script>
+// Code editor enhancements
+document.addEventListener('DOMContentLoaded', function() {
+    const codeEditor = document.getElementById('code');
+    const consoleOutput = document.getElementById('console-output');
+    
+    // Add line numbers functionality (simplified)
+    codeEditor.addEventListener('input', function() {
+        const lines = this.value.split('\n').length;
+        updateConsole(`[INFO] ${lines} lines of code`);
+    });
+    
+    // Clear code button
+    document.getElementById('clear-code')?.addEventListener('click', function() {
+        codeEditor.value = '';
+        updateConsole('[INFO] Code cleared');
+    });
+    
+    // Update console output
+    function updateConsole(message) {
+        const timestamp = new Date().toLocaleTimeString('fr-FR');
+        const currentContent = consoleOutput.innerHTML;
+        consoleOutput.innerHTML = currentContent + `<br><span class="text-vscode-secondary">[${timestamp}]</span> ${message}`;
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+    
+    // Command palette toggle (Ctrl+Shift+P)
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'P') {
+            e.preventDefault();
+            const palette = document.getElementById('command-palette');
+            palette.classList.toggle('d-none');
+            if (!palette.classList.contains('d-none')) {
+                palette.querySelector('.command-input').focus();
+            }
+        }
+        
+        // Escape to close command palette
+        if (e.key === 'Escape') {
+            document.getElementById('command-palette').classList.add('d-none');
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/analyzer.js') }}"></script>
+{% endblock %}

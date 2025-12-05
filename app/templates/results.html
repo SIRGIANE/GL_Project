@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Résultats d'Analyse - Bug Predictor AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2 mb-0">
+                    <i class="fas fa-chart-line text-primary me-2"></i>
+                    Résultats d'Analyse
+                </h1>
+                <div>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Nouvelle Analyse
+                    </a>
+                </div>
+            </div>
+            <p class="text-muted mb-0">Analysé le {{ result.timestamp }}</p>
+        </div>
+    </div>
+
+    <!-- Main Results Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center {% if result.is_bug %}border-danger{% else %}border-success{% endif %} h-100">
+                <div class="card-body">
+                    <div class="display-1 mb-3">
+                        {% if result.is_bug %}
+                            <i class="fas fa-bug text-danger"></i>
+                        {% else %}
+                            <i class="fas fa-check-circle text-success"></i>
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title">
+                        {% if result.is_bug %}
+                            🐛 BUGGY
+                        {% else %}
+                            ✅ PROPRE
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted">Prédiction du modèle</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 mb-3 {% if result.probability >= 0.7 %}text-danger{% elif result.probability >= 0.5 %}text-warning{% else %}text-success{% endif %}">
+                        {{ "%.1f"|format(result.probability * 100) }}%
+                    </div>
+                    <h5 class="card-title">Probabilité</h5>
+                    <p class="text-muted">Confiance du modèle</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 mb-3">
+                        {{ result.risk_level }}
+                    </div>
+                    <h5 class="card-title">Niveau de Risque</h5>
+                    <p class="text-muted">Classification</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-4 mb-3 {% if result.metrics.evaluation == 1 %}text-danger{% else %}text-success{% endif %}">
+                        {% if result.metrics.evaluation == 1 %}
+                            🚨
+                        {% else %}
+                            ✅
+                        {% endif %}
+                    </div>
+                    <h5 class="card-title">Évaluation</h5>
+                    <p class="text-muted">
+                        {% if result.metrics.evaluation == 1 %}
+                            Critique
+                        {% else %}
+                            Normal
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Code Display -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code me-2"></i>
+                        Code Analysé
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <pre class="code-display"><code class="language-python">{{ result.code }}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Métriques Principales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="metric-item p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">LOC</span>
+                                    <strong>{{ "%.0f"|format(result.metrics.LOC) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-item p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Complexité</span>
+                                    <strong>{{ "%.0f"|format(result.metrics.cyclomatic) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-item p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Volume (v)</span>
+                                    <strong>{{ "%.0f"|format(result.metrics.v) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-item p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Difficulté (d)</span>
+                                    <strong>{{ "%.2f"|format(result.metrics.d) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-item p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Effort</span>
+                                    <strong>{{ "%.0f"|format(result.metrics.e) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-item p-3 bg-light rounded">
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Temps (s)</span>
+                                    <strong>{{ "%.0f"|format(result.metrics.t) }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Features -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Toutes les Features (18)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Valeur</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set feature_names = [
+                                    ('LOC', 'Lignes de code totales'),
+                                    ('cyclomatic', 'Complexité cyclomatique'),
+                                    ('n', 'Longueur Halstead'),
+                                    ('v', 'Volume Halstead'),
+                                    ('l', 'Niveau Halstead'),
+                                    ('d', 'Difficulté Halstead'),
+                                    ('i', 'Intelligence Halstead'),
+                                    ('e', 'Effort Halstead'),
+                                    ('t', 'Temps de développement'),
+                                    ('sloc', 'Lignes de code source'),
+                                    ('comments', 'Lignes de commentaires'),
+                                    ('blank', 'Lignes vides'),
+                                    ('lloc', 'Lignes logiques de code'),
+                                    ('uniq_op', 'Opérateurs uniques'),
+                                    ('uniq_opnd', 'Opérandes uniques'),
+                                    ('total_op', 'Total opérateurs'),
+                                    ('total_opnd', 'Total opérandes'),
+                                    ('evaluation', 'Évaluation complexité')
+                                ] %}
+                                {% for i in range(result.features|length) %}
+                                <tr>
+                                    <td class="fw-bold">{{ feature_names[i][0] }}</td>
+                                    <td>
+                                        {% if i == 17 %}
+                                            <span class="badge {% if result.features[i] == 1 %}bg-danger{% else %}bg-success{% endif %}">
+                                                {{ result.features[i] }}
+                                            </span>
+                                        {% else %}
+                                            {{ "%.2f"|format(result.features[i]) if result.features[i] != result.features[i]|int else result.features[i]|int }}
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted small">{{ feature_names[i][1] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Visualization -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area me-2"></i>
+                        Visualisation des Features
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="featuresChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data for JavaScript -->
+<script type="application/json" id="chart-data">
+{
+    "features": {{ result.features|tojson }},
+    "feature_names": [
+        "LOC", "cyclomatic", "n", "v", "l", "d", "i", "e", "t",
+        "sloc", "comments", "blank", "lloc", "uniq_op", "uniq_opnd", 
+        "total_op", "total_opnd", "evaluation"
+    ]
+}
+</script>
+{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}

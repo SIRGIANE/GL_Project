@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+
+{% block title %}À Propos - Bug Predictor AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-4">
+                <i class="fas fa-bug text-primary me-3"></i>
+                Bug Predictor AI
+            </h1>
+            <p class="lead text-muted">
+                Une solution d'analyse statique alimentée par l'intelligence artificielle
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Description -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <h2 class="h3 mb-4 text-center">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        Qu'est-ce que Bug Predictor AI ?
+                    </h2>
+                    
+                    <p class="lead text-center mb-4">
+                        Bug Predictor AI est un système intelligent qui analyse votre code Python 
+                        pour détecter les bugs potentiels avant même leur apparition.
+                    </p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-search-plus text-primary mb-3" style="font-size: 2.5rem;"></i>
+                            <h5>Analyse Statique</h5>
+                            <p class="text-muted small">
+                                Extraction de 18 métriques détaillées de qualité de code
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-brain text-success mb-3" style="font-size: 2.5rem;"></i>
+                            <h5>Machine Learning</h5>
+                            <p class="text-muted small">
+                                Modèle entraîné sur des datasets de défauts logiciels
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-shield-alt text-info mb-3" style="font-size: 2.5rem;"></i>
+                            <h5>Prédiction</h5>
+                            <p class="text-muted small">
+                                Probabilité et niveau de risque pour chaque code analysé
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-cogs text-primary me-2"></i>
+                Comment ça fonctionne ?
+            </h2>
+            
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="badge bg-primary rounded-pill fs-4 mb-3">1</div>
+                            <i class="fas fa-paste text-primary mb-3" style="font-size: 2rem;"></i>
+                            <h5>Code Input</h5>
+                            <p class="text-muted">
+                                Vous collez votre code Python dans l'interface web
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="badge bg-primary rounded-pill fs-4 mb-3">2</div>
+                            <i class="fas fa-calculator text-warning mb-3" style="font-size: 2rem;"></i>
+                            <h5>Extraction</h5>
+                            <p class="text-muted">
+                                18 métriques sont extraites via la bibliothèque Radon
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="badge bg-primary rounded-pill fs-4 mb-3">3</div>
+                            <i class="fas fa-magic text-success mb-3" style="font-size: 2rem;"></i>
+                            <h5>Traitement</h5>
+                            <p class="text-muted">
+                                Normalisation et transformation des features (18→42)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="badge bg-primary rounded-pill fs-4 mb-3">4</div>
+                            <i class="fas fa-chart-line text-info mb-3" style="font-size: 2rem;"></i>
+                            <h5>Prédiction</h5>
+                            <p class="text-muted">
+                                Le modèle ML prédit la probabilité de bugs
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics Details -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-chart-bar text-primary me-2"></i>
+                Métriques Analysées
+            </h2>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-primary h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-code me-2"></i>
+                                Métriques de Base
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <strong>LOC:</strong> Lignes de code totales
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <strong>SLOC:</strong> Lignes de code source
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <strong>Commentaires:</strong> Lignes de commentaires
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <strong>Blancs:</strong> Lignes vides
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                                    <strong>LLOC:</strong> Lignes logiques de code
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card border-success h-100">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-brain me-2"></i>
+                                Métriques Halstead
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-success me-2"></i>
+                                    <strong>Volume (v):</strong> Taille du programme
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-success me-2"></i>
+                                    <strong>Difficulté (d):</strong> Complexité de compréhension
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-success me-2"></i>
+                                    <strong>Effort:</strong> Effort de développement
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-arrow-right text-success me-2"></i>
+                                    <strong>Temps:</strong> Temps estimé de développement
+                                </li>
+                                <li class="mb-0">
+                                    <i class="fas fa-arrow-right text-success me-2"></i>
+                                    <strong>Opérateurs/Opérandes:</strong> Éléments du code
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thresholds -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0 text-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Seuils Critiques
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-center mb-4">
+                        Si au moins un de ces seuils est dépassé, le code est considéré comme potentiellement bogué :
+                    </p>
+                    
+                    <div class="row g-3 text-center">
+                        <div class="col-md-2">
+                            <div class="bg-light p-3 rounded">
+                                <strong class="text-danger">n ≥ 300</strong><br>
+                                <small class="text-muted">Longueur</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="bg-light p-3 rounded">
+                                <strong class="text-danger">v ≥ 1000</strong><br>
+                                <small class="text-muted">Volume</small>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="bg-light p-3 rounded">
+                                <strong class="text-danger">d ≥ 50</strong><br>
+                                <small class="text-muted">Difficulté</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="bg-light p-3 rounded">
+                                <strong class="text-danger">effort ≥ 500k</strong><br>
+                                <small class="text-muted">Effort</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="bg-light p-3 rounded">
+                                <strong class="text-danger">time ≥ 5000</strong><br>
+                                <small class="text-muted">Temps (s)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technical Stack -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">
+                <i class="fas fa-layer-group text-primary me-2"></i>
+                Stack Technique
+            </h2>
+            
+            <div class="row g-4 text-center">
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="fab fa-python text-warning mb-3" style="font-size: 3rem;"></i>
+                        <h5>Python</h5>
+                        <p class="text-muted small">Backend et analyse de code</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="fas fa-flask text-success mb-3" style="font-size: 3rem;"></i>
+                        <h5>Flask</h5>
+                        <p class="text-muted small">Framework web et API REST</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="fas fa-robot text-primary mb-3" style="font-size: 3rem;"></i>
+                        <h5>Scikit-learn</h5>
+                        <p class="text-muted small">Machine Learning et prédictions</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4">
+                        <i class="fab fa-bootstrap text-info mb-3" style="font-size: 3rem;"></i>
+                        <h5>Bootstrap</h5>
+                        <p class="text-muted small">Interface utilisateur moderne</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
