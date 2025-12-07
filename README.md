@@ -16,5 +16,5 @@ Une application d'Intelligence Artificielle pour prédire les fichiers à risque
 
 1. **Cloner le repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/SIRGIANE/GL_Project.git
 cd bug-predictor
